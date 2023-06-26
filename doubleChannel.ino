@@ -5,6 +5,7 @@ int idx = 0;
 bool analogPin = 0;
 
 volatile int readFlag;
+volatile int analogVal = 0;
 
 //  Initialization
 void setup(){
@@ -80,10 +81,10 @@ void loop(){
 void serialPrint() {
   for(int i = 0; i < max_storage; i++) {
     Serial.print("Variable_1:");
-    Serial.println(valores0[i]);
-//    Serial.print(",");
-//    Serial.print("Variable_2");
-//    Serial.println(valores1[i]);
+    Serial.print(valores0[i]);
+    Serial.print(",");
+    Serial.print("Variable_2:");
+    Serial.println(valores1[i]);
   }
   interrupts();
 }
@@ -94,16 +95,15 @@ ISR(ADC_vect){
   readFlag = 1;
  
   //  Must read low first
-  valores0[idx] = ADCL | (ADCH << 8);
-  idx++;
-//  if (analogPin) {
-//    valores1[idx] = analogVal;
-//    ADMUX &= B11111110;
-//    idx++;
-//  }
-//  else {
-//    valores0[idx] = analogVal;
-//    ADMUX |= B1;
-//  }
-//  analogPin = !analogPin;
+  analogVal = ADCL | (ADCH << 8);
+  if (analogPin) {
+    valores1[idx] = analogVal;
+    ADMUX &= B11111110;
+    idx++;
+  }
+  else {
+    valores0[idx] = analogVal;
+    ADMUX |= B1;
+  }
+  analogPin = !analogPin;
 }
